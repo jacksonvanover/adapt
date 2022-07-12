@@ -2,4 +2,6 @@ arclength
 arclength-float
 arclength-adapt
 arclength-mixed
+arclength-hpac
 adapt_recommend.json
+*.h5
