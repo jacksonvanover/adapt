@@ -1,0 +1,13 @@
+ans: 2.000000e+00
+=== BEGIN ADAPT REPORT ===
+6000009 total independent/intermediate variables
+1 dependent variables
+Mixed-precision recommendation:
+  Replace variable b           max error introduced: 0.000000e+00  count: 1           totalerr: 0.000000e+00
+  Replace variable a           max error introduced: 0.000000e+00  count: 1           totalerr: 0.000000e+00
+  Replace variable h           max error introduced: 4.152677e-15  count: 1           totalerr: 4.152677e-15
+  Replace variable pi          max error introduced: 9.154282e-14  count: 1           totalerr: 9.569550e-14
+  Replace variable result      max error introduced: 2.967209e-11  count: 2000002     totalerr: 2.976779e-11
+  DO NOT replace   x           max error introduced: 2.397519e-07  count: 2000001     totalerr: 2.397817e-07
+  DO NOT replace   s1          max error introduced: 8.160601e-05  count: 2000002     totalerr: 8.184579e-05
+=== END ADAPT REPORT ===
