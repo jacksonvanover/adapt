@@ -1,4 +1,4 @@
-TARGETS=arclength arclength-float arclength-adapt arclength-mixed
+TARGETS=arclength arclength-float arclength-adapt arclength-mixed arclength-hpac
 CXXFLAGS+=-g -O3 -Wall
 LDFLAGS=-lm
 ADAPTFLAGS=--std=c++11 -I$(CODIPACK_HOME)/include -I../ -DCODI_ReversalZeroesAdjoints=0
@@ -39,6 +39,9 @@ arclength-adapt: arclength-adapt.cpp
 
 arclength-mixed: arclength-mixed.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+arclength-hpac: arclength-hpac.cpp
+	rm -f test.h5 && clang -fapprox $^ -o $@ -lapprox -lhdf5 -lm
 
 clean:
 	rm -rf $(TARGETS)
