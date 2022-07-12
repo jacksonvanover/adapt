@@ -1,0 +1,18 @@
+=== BEGIN ADAPT REPORT ===
+15000004 total independent/intermediate variables
+1 dependent variables
+Mixed-precision recommendation:
+  Replace variable d2      max error introduced: 0.000000e+00  count: 6000000     totalerr: 0.000000e+00
+  Replace variable d1      max error introduced: 0.000000e+00  count: 1           totalerr: 0.000000e+00
+  DO NOT replace   t2      max error introduced: 8.623994e-08  count: 1000000     totalerr: 8.623994e-08
+  DO NOT replace   t1      max error introduced: 8.623994e-08  count: 1000001     totalerr: 1.724799e-07
+  DO NOT replace   h       max error introduced: 5.401810e-07  count: 1           totalerr: 7.126609e-07
+  DO NOT replace   t3      max error introduced: 9.462050e-07  count: 6000000     totalerr: 1.658866e-06
+  DO NOT replace   s1      max error introduced: 6.334703e-06  count: 1000001     totalerr: 7.993569e-06
+=== END ADAPT REPORT ===
+Arclength - SUCCESSFUL!
+
+A couple of questions:
+  - it's unclear how the choice to put everything in single precision
+  along with the error bound described in the paper came about based
+  on the above information
