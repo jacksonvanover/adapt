@@ -1,4 +1,4 @@
-TARGETS=simpsons simpsons-float simpsons-adapt simpsons-mixed
+TARGETS=simpsons simpsons-float simpsons-adapt simpsons-mixed simpsons-hpac
 CXXFLAGS+=-g -O3 -Wall
 LDFLAGS=-lm
 ADAPTFLAGS=--std=c++11 -I$(CODIPACK_HOME)/include -I../ -DCODI_ReversalZeroesAdjoints=0
@@ -39,6 +39,9 @@ simpsons-adapt: simpsons-adapt.cpp
 
 simpsons-mixed: simpsons-mixed.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+simpsons-hpac: simpsons-hpac.cpp
+	rm -f test.h5 && clang -fapprox $^ -o $@ -lapprox -lhdf5 -lm
 
 clean:
 	rm -rf $(TARGETS)
