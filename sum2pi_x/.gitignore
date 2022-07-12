@@ -2,4 +2,6 @@ sum2pi_x
 sum2pi_x-float
 sum2pi_x-adapt
 sum2pi_x-mixed
+sum2pi_x-hpac
 adapt_recommend.json
+*.h5

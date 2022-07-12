@@ -1,0 +1,9 @@
+=== BEGIN ADAPT REPORT ===
+100001 total independent/intermediate variables
+1 dependent variables
+Mixed-precision recommendation:
+  Replace variable tmp      max error introduced: 1.748455e-04  count: 48000       totalerr: 1.748455e-04
+  Replace variable acc      max error introduced: 2.918679e-03  count: 50000       totalerr: 3.093524e-03
+  DO NOT replace   sum      max error introduced: 1.385115e-01  count: 2001        totalerr: 1.416050e-01
+=== END ADAPT REPORT ===
+SUM2PI_X - SUCCESSFUL!

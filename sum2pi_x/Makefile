@@ -1,4 +1,4 @@
-TARGETS=sum2pi_x sum2pi_x-float sum2pi_x-adapt sum2pi_x-mixed
+TARGETS=sum2pi_x sum2pi_x-float sum2pi_x-adapt sum2pi_x-mixed sum2pi_x-hpac
 CXXFLAGS+=-g -O3 -Wall
 LDFLAGS=-lm
 ADAPTFLAGS=--std=c++11 -I$(CODIPACK_HOME)/include -I../ -DCODI_ReversalZeroesAdjoints=0
@@ -39,6 +39,9 @@ sum2pi_x-adapt: sum2pi_x-adapt.cpp
 
 sum2pi_x-mixed: sum2pi_x-mixed.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+sum2pi_x-hpac: sum2pi_x-hpac.cpp
+	rm -f test.h5 && clang -fapprox $^ -o $@ -lapprox -lhdf5 -lm
 
 clean:
 	rm -rf $(TARGETS)
