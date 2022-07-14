@@ -1,0 +1,56 @@
+vanover1@quartz188:~/GSA_22/submodules/adapt/HPCCG/HPCCG-adapt$ ./test_HPCCG 20 30 160
+Initial Residual = 1358.72
+Iteration = 10   Residual = 66.0369
+Iteration = 20   Residual = 0.87865
+Iteration = 30   Residual = 0.0151087
+Iteration = 40   Residual = 0.000381964
+Iteration = 50   Residual = 7.61536e-06
+Iteration = 60   Residual = 1.72153e-07
+Iteration = 70   Residual = 3.82199e-09
+Iteration = 80   Residual = 6.71005e-11
+Iteration = 90   Residual = 6.27926e-13
+Iteration = 99   Residual = 7.8055e-15
+Mini-Application Name: hpccg
+Mini-Application Version: 1.0
+Parallelism: 
+  MPI not enabled: 
+  OpenMP not enabled: 
+Dimensions: 
+  nx: 20
+  ny: 30
+  nz: 160
+Number of iterations: : 99
+Final residual: : 7.8055e-15
+********** Performance Summary (times in sec) ***********: 
+Time Summary: 
+  Total   : 18.9361
+  DDOT    : 0.226443
+  WAXPBY  : 4.46416
+  SPARSEMV: 2.35942
+FLOPS Summary: 
+  Total   : 6.08256e+08
+  DDOT    : 3.8016e+07
+  WAXPBY  : 5.7024e+07
+  SPARSEMV: 5.13216e+08
+MFLOPS Summary: 
+  Total   : 32.1216
+  DDOT    : 167.883
+  WAXPBY  : 12.7737
+  SPARSEMV: 217.518
+Difference between computed and exact (residual)  = 2.8866e-15.
+
+=== BEGIN ADAPT REPORT ===
+28704396 total independent/intermediate variables
+1 dependent variables
+Mixed-precision recommendation:
+  Replace variable normr:HPCCG.cpp:125      max error introduced: 0.00000e+00  count: 99          totalerr: 0.00000e+00
+  Replace variable normr:HPCCG.cpp:105      max error introduced: 0.00000e+00  count: 1           totalerr: 0.00000e+00
+  Replace variable x:main.cpp:181           max error introduced: 0.00000e+00  count: 96000       totalerr: 0.00000e+00
+  Replace variable b:main.cpp:182           max error introduced: 0.00000e+00  count: 96000       totalerr: 0.00000e+00
+  DO NOT replace   beta:HPCCG.cpp:120       max error introduced: 6.35086e-21  count: 98          totalerr: 6.35086e-21
+  DO NOT replace   alpha:HPCCG.cpp:138      max error introduced: 3.59334e-20  count: 99          totalerr: 4.22843e-20
+  DO NOT replace   alpha:HPCCG.cpp:137      max error introduced: 5.61582e-20  count: 99          totalerr: 9.84425e-20
+  DO NOT replace   r:HPCCG.cpp:142          max error introduced: 2.05151e-08  count: 9504000     totalerr: 2.05151e-08
+  DO NOT replace   Ap:HPCCG.cpp:135         max error introduced: 4.20565e-08  count: 9504000     totalerr: 6.25716e-08
+  DO NOT replace   x:HPCCG.cpp:140          max error introduced: 1.85488e-07  count: 9504000     totalerr: 2.48059e-07
+=== END ADAPT REPORT ===
