@@ -99,6 +99,7 @@ int HPCCG(HPC_Sparse_Matrix * A,
   TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3);
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
+#pragma approx snapshot(out) out(normr) label("HPCCG::normr_0")
   normr = sqrt(rtrans);
 
   if (rank==0) cout << "Initial Residual = "<< normr << endl;
@@ -114,8 +115,10 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
 	  double beta = rtrans/oldrtrans;
+#pragma approx snapshot(in) in(beta) label("HPCCG::beta_0")
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
 	}
+#pragma approx snapshot(out) out(normr) label("HPCCG::normr_1")
       normr = sqrt(rtrans);
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
       cout << "Iteration = "<< k << "   Residual = "<< normr << endl;
@@ -124,11 +127,16 @@ int HPCCG(HPC_Sparse_Matrix * A,
 #ifdef USING_MPI
       TICK(); exchange_externals(A,p); TOCK(t5); 
 #endif
+#pragma approx snapshot(out) out(Ap[0:nrow]) label("HPCCG::Ap_0")
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
       double alpha = 0.0;
+#pragma approx snapshot(out) out(alpha) label("HPCCG::alpha_0")
       TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); // 2*nrow ops
+#pragma approx snapshot(out) out(alpha) label("HPCCG::alpha_1")
       alpha = rtrans/alpha;
+#pragma approx snapshot(out) out(x[0:nrow]) label("HPCCG::x_0")
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
+#pragma approx snapshot(out) out(r[0:nrow]) label("HPCCG::r_0")
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
       niters = k;
     }

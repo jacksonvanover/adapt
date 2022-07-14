@@ -66,6 +66,7 @@ using std::endl;
 #include <string>
 #include <cmath>
 #include <iomanip>
+#include <approx.h>
 #ifdef USING_MPI
 #include <mpi.h> // If this routine is compiled with -DUSING_MPI
                  // then include mpi.h
@@ -171,6 +172,7 @@ int main(int argc, char *argv[])
   double normr = 0.0;
   int max_iter = 100;
   double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+#pragma approx snapshot(out) out(x[0:A->total_nrow], b[0:A->total_nrow]) label("main::x_0,b_0")
   ierr = HPCCG( A, b, x, max_iter, tolerance, niters, normr, times);
 
 	if (ierr) cerr << "Error in call to CG: " << ierr << ".\n" << endl;
@@ -280,6 +282,7 @@ int main(int argc, char *argv[])
      cout << std::setprecision(5) <<  "Difference between computed and exact (residual)  = " 
           << residual << ".\n" << endl;
 
+  HPACRegisterApplicationOutput(&residual, sizeof(double), "residual", HDOUBLE);
 
   // Finish up
 #ifdef USING_MPI
