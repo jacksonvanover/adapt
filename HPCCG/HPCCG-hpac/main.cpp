@@ -274,6 +274,8 @@ int main(int argc, char *argv[])
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
 
+  HPACRegisterApplicationOutput(x, A->total_nrow*sizeof(double), "solution", HDOUBLE);
+
   double residual = 0;
   if ((ierr = compute_residual(A->local_nrow, x, xexact, &residual)))
      cerr << "Error in call to compute_residual: " << ierr << ".\n" << endl;
@@ -281,8 +283,6 @@ int main(int argc, char *argv[])
    if (rank==0)
      cout << std::setprecision(5) <<  "Difference between computed and exact (residual)  = " 
           << residual << ".\n" << endl;
-
-  HPACRegisterApplicationOutput(&residual, sizeof(double), "residual", HDOUBLE);
 
   // Finish up
 #ifdef USING_MPI
