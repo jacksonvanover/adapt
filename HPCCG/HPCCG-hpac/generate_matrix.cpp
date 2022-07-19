@@ -43,6 +43,7 @@ using std::endl;
 #include <cstdlib>
 #include <cstdio>
 #include <cassert>
+#include <ctime> 
 #include "generate_matrix.hpp"
 void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, double **x, double **b, double **xexact)
 
@@ -61,6 +62,8 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, double **x, 
   int size = 1; // Serial case (not using MPI)
   int rank = 0;
 #endif
+
+  srand(time(0));
 
   *A = new HPC_Sparse_Matrix; // Allocate matrix struct and fill it
   (*A)->title = 0;
@@ -133,7 +136,7 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, double **x, 
 	(*A)->nnz_in_row[curlocalrow] = nnzrow;
 	nnzglobal += nnzrow;
 	(*x)[curlocalrow] = 0.0;
-	(*b)[curlocalrow] = 27.0 - ((double) (nnzrow-1));
+	(*b)[curlocalrow] = 27.0 - ((double) (nnzrow-1)) + (double)(rand()) / (double)(RAND_MAX);
 	(*xexact)[curlocalrow] = 1.0;
       } // end ix loop
      } // end iy loop
