@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
   double normr = 0.0;
   int max_iter = 100;
   double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
-#pragma approx snapshot(out) out(x[0:A->total_nrow], b[0:A->total_nrow]) label("main::x_0,b_0")
+#pragma approx snapshot(in) in(x[0:A->total_nrow], b[0:A->total_nrow]) label("main::x_0,b_0")
   ierr = HPCCG( A, b, x, max_iter, tolerance, niters, normr, times);
 
 	if (ierr) cerr << "Error in call to CG: " << ierr << ".\n" << endl;
