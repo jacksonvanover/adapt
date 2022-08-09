@@ -199,6 +199,7 @@ void AD_report()
     //
     std::unordered_map<std::string, long>        varCount;
     std::unordered_map<std::string, double> varMetric;
+    std::unordered_map<std::string, std::vector<double>> varPartials;
     std::unordered_map<std::string, std::vector<double> > varOutputError;
 
     // dependent labels and tolerated errors
@@ -242,6 +243,9 @@ void AD_report()
                 varMetric[inputLabel] = 0.0;
             }
             varMetric[inputLabel] += partial * value;
+
+            // save the partials for this input variable
+            varPartials[inputLabel].push_back(partial);
 
             // output error if converted to single precision (aggregated by
             // variable, stored separately for each dependent variable)
@@ -318,6 +322,12 @@ void AD_report()
             if (i > 0) { std::cout << " "; }
             std::cout << totalError[i];           // total error contribution 
         }
+
+        std::cout << "  partials:";
+        for (auto& x : varPartials[var.first]){
+            std::cout << " " << x << ",";
+        }
+        
         std::cout << std::endl;
     }
 
