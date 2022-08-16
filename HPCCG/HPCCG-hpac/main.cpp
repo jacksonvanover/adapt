@@ -66,7 +66,6 @@ using std::endl;
 #include <string>
 #include <cmath>
 #include <iomanip>
-#include <approx.h>
 #ifdef USING_MPI
 #include <mpi.h> // If this routine is compiled with -DUSING_MPI
                  // then include mpi.h
@@ -150,7 +149,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    read_HPC_row(argv[1], &A, &x, &b, &xexact);
+    readHBSMF(argv[1], &A, &x, &b, &xexact);
   }
 
 
@@ -274,7 +273,7 @@ int main(int argc, char *argv[])
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
 
-  HPACRegisterApplicationOutput(x, A->total_nrow*sizeof(double), "solution", HDOUBLE);
+//  HPACRegisterApplicationOutput(x, A->total_nrow*sizeof(double), "solution", HDOUBLE);
 
   double residual = 0;
   if ((ierr = compute_residual(A->local_nrow, x, xexact, &residual)))
