@@ -323,11 +323,12 @@ void AD_report()
             std::cout << totalError[i];           // total error contribution 
         }
 
-        std::cout << "  partials:";
+        std::cout << "  avg of partials:";
+        double agg_partials = 0;
         for (auto& x : varPartials[var.first]){
-            std::cout << " " << x << ",";
+            agg_partials = agg_partials + fabs(x);
         }
-        
+        std::cout << " " << agg_partials / varPartials[var.first].size();
         std::cout << std::endl;
     }
 
