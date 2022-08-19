@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    read_HPC_row(argv[1], &A, &x, &b, &xexact);
+    readHBSMF(argv[1], &A, &x, &b, &xexact);
   }
 
 
