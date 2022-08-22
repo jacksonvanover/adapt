@@ -171,8 +171,8 @@ int main(int argc, char *argv[])
   double t1 = mytimer();   // Initialize it (if needed)
   int niters = 0;
   AD_real normr = 0.0;
-  int max_iter = 100;
-  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+  int max_iter = 100000;
+  double tolerance = 1e-50; // Set tolerance to zero to make all runs do max_iter iterations
 
   AD_begin();
 //  AD_enable_absolute_value_error();
