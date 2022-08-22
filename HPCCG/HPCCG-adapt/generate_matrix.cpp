@@ -177,6 +177,7 @@ void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_re
     curindptr += colptr[i];
     (*x)[i] = 1.0;
     (*b)[i] = 0;
+    (*xexact)[i] = 0;
   }
 
   (*A)->start_row = 0; 
