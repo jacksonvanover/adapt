@@ -101,8 +101,8 @@ int HPCCG(HPC_Sparse_Matrix * A,
   TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3);
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
+  AD_INTERMEDIATE(rtrans, "r_dot"); 
   normr = sqrt(AD_value(rtrans));
-  AD_INTERMEDIATE(normr, "normr");
 
   if (rank==0) cout << "Initial Residual = "<< AD_value(normr) << endl;
 
@@ -117,12 +117,10 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
 	  AD_real beta = rtrans/oldrtrans;
-          AD_INTERMEDIATE(beta, "beta");
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
-	  //for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(p[ii], "p"+std::to_string(k));}; 
+	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(p[ii], "p_wxpy");}; 
 	}
       normr = sqrt(rtrans);
-      AD_INTERMEDIATE(normr, "normr");
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
       cout << "Iteration = "<< k << "   Residual = "<< AD_value(normr) << endl;
      
@@ -132,14 +130,14 @@ int HPCCG(HPC_Sparse_Matrix * A,
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
 
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(Ap[ii], "Ap");}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(Ap[ii], "matvec");}; 
       AD_real alpha = 0.0;
-      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE(alpha, "alpha");
-      alpha = rtrans/alpha; AD_INTERMEDIATE(alpha, "alpha");
+      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE(alpha, "a_dot");
+      alpha = rtrans/alpha;
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(x[ii], "x");}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(x[ii], "x_wxpy");}; 
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(r[ii], "r");}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(r[ii], "r_wxpy");}; 
       niters = k;
     }
 
