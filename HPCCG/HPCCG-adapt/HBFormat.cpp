@@ -9,6 +9,7 @@
 using namespace std;
 
 # include "HBFormat.hpp"
+#include "adapt.h"
 
 //****************************************************************************80
 
@@ -431,7 +432,7 @@ void hb_file_read ( ifstream &input, char **title, char **key, int *totcrd,
   int *ptrcrd, int *indcrd, int *valcrd, int *rhscrd, char **mxtype, int *nrow, 
   int *ncol, int *nnzero, int *neltvl, char **ptrfmt, char **indfmt, char **valfmt, 
   char **rhsfmt, char **rhstyp, int *nrhs, int *nrhsix, int **colptr, 
-  int **rowind, double **values, double **rhsval, int **rhsptr, int **rhsind,  
+  int **rowind, AD_real **values, double **rhsval, int **rhsptr, int **rhsind,  
   double **rhsvec, double **guess, double **exact )
 
 //****************************************************************************80
@@ -629,11 +630,11 @@ void hb_file_read ( ifstream &input, char **title, char **key, int *totcrd,
 
     if ( (*mxtype)[2] == 'A' )
     {
-      *values = new double[*nnzero];
+      *values = new AD_real[*nnzero];
     }
     else if ( (*mxtype)[2] == 'E' )
     {
-      *values = new double[*neltvl];
+      *values = new AD_real[*neltvl];
     }
     else
     {
@@ -2838,7 +2839,7 @@ void hb_values_print ( int ncol, int colptr[], char *mxtype, int nnzero,
 //****************************************************************************80
 
 void hb_values_read ( ifstream &input, int valcrd, char *mxtype, int nnzero,
-  int neltvl, char *valfmt, double values[] )
+  int neltvl, char *valfmt, AD_real values[] )
 
 //****************************************************************************80
 //

@@ -36,8 +36,5 @@
 #include "adapt.h"
 
 void read_HPC_row(char *data_file, HPC_Sparse_Matrix **A,
-		  double **x, double **b, double **xexact);
-
-void read_HPC_row(char *data_file, HPC_Sparse_Matrix **A,
 		  AD_real **x, AD_real **b, double **xexact);
 #endif

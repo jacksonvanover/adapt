@@ -77,7 +77,7 @@ void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_re
   int totcrd;
   int valcrd;
   char *valfmt = NULL;
-  double *values = NULL;
+  AD_real *values = NULL;
 
   *A = new HPC_Sparse_Matrix; // Allocate matrix struct and fill it
 
@@ -118,11 +118,11 @@ void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_re
 
   if ( mxtype[2] == 'A' )
   {
-    values = new double[nnzero];
+    values = new AD_real[nnzero];
   }
   else if ( mxtype[2] == 'E' )
   {
-    values =  new double[neltvl];
+    values =  new AD_real[neltvl];
   }
   else
   {
@@ -148,14 +148,14 @@ void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_re
   (*A)->list_of_inds = rowind;  
 
   (*A)->nnz_in_row  = colptr; 
-  (*A)->ptr_to_vals_in_row  = new double*[local_nrow];
+  (*A)->ptr_to_vals_in_row  = new AD_real*[local_nrow];
   (*A)->ptr_to_inds_in_row  = new int   *[local_nrow];
 
   for ( int i = 0; i < nnzero; i++){
     rowind[i] -= 1;
   }
 
-  double * curvalptr = (*A)->list_of_vals;
+  AD_real * curvalptr = (*A)->list_of_vals;
   int * curindptr = (*A)->list_of_inds;
   int total_elements = 0;
   for ( int i = 0; i < ncol; i++){
@@ -167,8 +167,6 @@ void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_re
   *x = new AD_real[local_nrow];
   *b = new AD_real[local_nrow];
   *xexact = new double[local_nrow];
-
-  double *data = new double[nrow*ncol]();
 
   for ( int i = 0 ; i < nrow; i++){
     (*A)->ptr_to_vals_in_row[i] = curvalptr;
@@ -229,9 +227,9 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, AD_real **x,
 
   // Allocate arrays that are of length local_nrow
   (*A)->nnz_in_row          = new int[local_nrow];
-  (*A)->ptr_to_vals_in_row  = new double*[local_nrow];
+  (*A)->ptr_to_vals_in_row  = new AD_real*[local_nrow];
   (*A)->ptr_to_inds_in_row  = new int   *[local_nrow];
-  (*A)->ptr_to_diags        = new double*[local_nrow];
+  (*A)->ptr_to_diags        = new AD_real*[local_nrow];
 
   *x = new AD_real[local_nrow];
   *b = new AD_real[local_nrow];
@@ -239,10 +237,10 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, AD_real **x,
 
 
   // Allocate arrays that are of length local_nnz
-  (*A)->list_of_vals = new double[local_nnz];
+  (*A)->list_of_vals = new AD_real[local_nnz];
   (*A)->list_of_inds = new int   [local_nnz];
 
-  double * curvalptr = (*A)->list_of_vals;
+  AD_real * curvalptr = (*A)->list_of_vals;
   int * curindptr = (*A)->list_of_inds;
 
   long long nnzglobal = 0;

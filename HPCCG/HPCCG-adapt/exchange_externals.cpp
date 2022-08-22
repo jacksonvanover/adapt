@@ -47,7 +47,7 @@ void exchange_externals(HPC_Sparse_Matrix * A, const double *x)
   int * recv_length = A->recv_length;
   int * send_length = A->send_length;
   int * neighbors = A->neighbors;
-  double * send_buffer = A->send_buffer;
+  AD_real * send_buffer = A->send_buffer;
   int total_to_be_sent = A->total_to_be_sent;
   int * elements_to_send = A->elements_to_send;
   

@@ -2,6 +2,7 @@
 #define __HBFORMAT__
 #include <iostream>
 #include <fstream>
+#include "adapt.h"
 
 bool ch_eqi ( char c1, char c2 );
 bool ch_is_digit ( char c );
@@ -15,7 +16,7 @@ void hb_file_read ( std::ifstream &input, char **title, char **key, int *totcrd,
   int *ptrcrd, int *indcrd, int *valcrd, int *rhscrd, char **mxtype, int *nrow, 
   int *ncol, int *nnzero, int *neltvl, char **ptrfmt, char **indfmt, char **valfmt, 
   char **rhsfmt, char **rhstyp, int *nrhs, int *nrhsix, int **colptr, 
-  int **rowind, double **values, double **rhsval, int **rhsptr, int **rhsind,  
+  int **rowind, AD_real **values, double **rhsval, int **rhsptr, int **rhsind,  
   double **rhsvec, double **guess, double **exact );
 void hb_file_write ( std::ofstream &output, char *title, char *key, int totcrd, 
   int ptrcrd, int indcrd, int valcrd, int rhscrd, char *mxtype, int nrow, 
@@ -59,7 +60,7 @@ int *hb_ua_colind ( int ncol, int colptr[], int nnzero );
 void hb_values_print ( int ncol, int colptr[], char *mxtype, int nnzero, 
   int neltvl, double values[] );
 void hb_values_read ( std::ifstream &input, int valcrd, char *mxtype, int nnzero,
-  int neltvl, char *valfmt, double values[] );
+  int neltvl, char *valfmt, AD_real values[] );
 void hb_values_write ( std::ofstream &output, int valcrd, char *mxtype, 
   int nnzero, int neltvl, char *valfmt, double values[] );
 double *hb_vecmat_a_mem ( int nrow, int ncol, int nnzero, int nrhs, 
