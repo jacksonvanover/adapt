@@ -178,12 +178,12 @@ int main(int argc, char *argv[])
 //  AD_enable_absolute_value_error();
   AD_enable_source_aggregation();
   for (int i = 0; i < A->total_nrow; i++) {
-    AD_INDEPENDENT(x[i], "x");
-    AD_INDEPENDENT(b[i], "b");
+    AD_INDEPENDENT(x[i], "x_in");
+    AD_INDEPENDENT(b[i], "b_in");
   }
   for (int i = 0; i < A->total_nrow; i++) {
     for (int j = 0; j< A->nnz_in_row[i]; j++){
-      AD_INDEPENDENT(A->ptr_to_vals_in_row[i][j], "A");
+      AD_INDEPENDENT(A->ptr_to_vals_in_row[i][j], "A_in");
     }
   }
 
