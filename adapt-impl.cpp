@@ -150,6 +150,14 @@ void AD_intermediate_iter(AD_real &var, std::string label, std::string source, i
     AD_intermediate(var, label);
 }
 
+void AD_intermediate_label(AD_real &var, std::string label, std::string source, std::string tag)
+{
+    if (useSourceInfo) {
+        label = label + ":" + source;
+    }
+    label = label + ": " + tag;
+    AD_intermediate(var, label);
+}
 
 void AD_dependent(AD_real &var, std::string label, double toleratedError)
 {
@@ -340,21 +348,13 @@ void AD_report()
         std::cout << "  avg of partials: " << avg_partials;
         std::cout << "  std of partials: " << std_partials;
 
-        double agg_errors = 0;
-        double avg_errors;
-        double std_errors;
+        double max_trunc_error = 0;
         for (auto& x : varErrors[var.first]){
-            agg_errors = agg_errors + fabs(x);
+            if ( fabs(x) > max_trunc_error ){
+                max_trunc_error = fabs(x);
+            } 
         }
-        avg_errors = agg_errors / varErrors[var.first].size();
-        agg_errors = 0;
-        for (auto& x : varErrors[var.first]){
-            agg_errors = agg_errors + pow(x - avg_errors, 2);
-        }
-        std_errors = sqrt(agg_errors/varErrors[var.first].size());
-        std::cout << "  avg of errors: " << avg_errors;
-        std::cout << "  std of errors: " << std_errors;
-
+        std::cout << "  max of trunc errors: " << max_trunc_error;
         std::cout << std::endl;
     }
 
