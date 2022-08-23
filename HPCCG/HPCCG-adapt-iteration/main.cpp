@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    read_HPC_row(argv[1], &A, &x, &b, &xexact);
+    readHBSMF(argv[1], &A, &x, &b, &xexact);
   }
 
 
@@ -171,15 +171,20 @@ int main(int argc, char *argv[])
   double t1 = mytimer();   // Initialize it (if needed)
   int niters = 0;
   AD_real normr = 0.0;
-  int max_iter = 100;
-  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+  int max_iter = 100000;
+  double tolerance = 1e-50; // Set tolerance to zero to make all runs do max_iter iterations
 
   AD_begin();
 //  AD_enable_absolute_value_error();
-AD_enable_source_aggregation();
+  AD_enable_source_aggregation();
   for (int i = 0; i < A->total_nrow; i++) {
-    AD_INDEPENDENT(x[i], "x");
-    AD_INDEPENDENT(b[i], "b");
+    AD_INDEPENDENT(x[i], "x_in");
+    AD_INDEPENDENT(b[i], "b_in");
+  }
+  for (int i = 0; i < A->total_nrow; i++) {
+    for (int j = 0; j< A->nnz_in_row[i]; j++){
+      AD_INDEPENDENT(A->ptr_to_vals_in_row[i][j], "A_in");
+    }
   }
 
   ierr = HPCCG( A, b, x, max_iter, tolerance, niters, normr, times);
@@ -283,11 +288,11 @@ AD_enable_source_aggregation();
   // All processors are needed here.
 
   AD_real residual = 0;
-  if ((ierr = compute_residual(A->local_nrow, x, xexact, &residual)))
+    if ((ierr = compute_residual(A->local_nrow, x, xexact, &residual)))
     cerr << "Error in call to compute_residual: " << ierr << ".\n" << endl;
 
    if (rank==0)
-     cout << std::setprecision(5) <<  "Difference between computed and exact  = " 
+     cout << std::setprecision(5) << "Difference between computed and exact (residual)  = " 
           << AD_value(residual) << ".\n" << endl;
 
   AD_DEPENDENT(residual, "residual", 0.0);
