@@ -201,6 +201,7 @@ void AD_report()
     std::unordered_map<std::string, double> varMetric;
     std::unordered_map<std::string, std::vector<double>> varPartials;
     std::unordered_map<std::string, std::vector<double> > varOutputError;
+    std::unordered_map<std::string, std::vector<double>> varErrors;
 
     // dependent labels and tolerated errors
     std::vector<std::string> depLabels;
@@ -244,8 +245,9 @@ void AD_report()
             }
             varMetric[inputLabel] += partial * value;
 
-            // save the partials for this input variable
+            // save the partials and errors for this input variable
             varPartials[inputLabel].push_back(partial);
+            varErrors[inputLabel].push_back(varInputError);
 
             // output error if converted to single precision (aggregated by
             // variable, stored separately for each dependent variable)
@@ -337,6 +339,22 @@ void AD_report()
         std_partials = sqrt(agg_partials/varPartials[var.first].size());
         std::cout << "  avg of partials: " << avg_partials;
         std::cout << "  std of partials: " << std_partials;
+
+        double agg_errors = 0;
+        double avg_errors;
+        double std_errors;
+        for (auto& x : varErrors[var.first]){
+            agg_errors = agg_errors + fabs(x);
+        }
+        avg_errors = agg_errors / varErrors[var.first].size();
+        agg_errors = 0;
+        for (auto& x : varErrors[var.first]){
+            agg_errors = agg_errors + pow(x - avg_errors, 2);
+        }
+        std_errors = sqrt(agg_errors/varErrors[var.first].size());
+        std::cout << "  avg of errors: " << avg_errors;
+        std::cout << "  std of errors: " << std_errors;
+
         std::cout << std::endl;
     }
 
