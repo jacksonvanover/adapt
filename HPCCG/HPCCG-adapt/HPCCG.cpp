@@ -101,7 +101,6 @@ int HPCCG(HPC_Sparse_Matrix * A,
   TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3);
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
-  AD_INTERMEDIATE(rtrans, "r_dot"); 
   normr = sqrt(AD_value(rtrans));
 
   if (rank==0) cout << "Initial Residual = "<< AD_value(normr) << endl;
@@ -116,6 +115,7 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	{
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
+    AD_INTERMEDIATE(rtrans, "r_dot"); 
 	  AD_real beta = rtrans/oldrtrans;
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
 	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(p[ii], "p_wxpy");}; 
