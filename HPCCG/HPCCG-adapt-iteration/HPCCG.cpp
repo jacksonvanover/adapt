@@ -115,10 +115,10 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	{
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
-    AD_INTERMEDIATE_ITER(rtrans, "r_dot", k);
+    AD_INTERMEDIATE_LABEL(rtrans, "r_dot", std::to_string(AD_value(normr)));
 	  AD_real beta = rtrans/oldrtrans;
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
-	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(p[ii], "p_wxpy", k);}; 
+	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(p[ii], "p_wxpy", std::to_string(AD_value(normr)));}; 
 	}
       normr = sqrt(rtrans);
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
@@ -130,14 +130,14 @@ int HPCCG(HPC_Sparse_Matrix * A,
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
 
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(Ap[ii], "matvec", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(Ap[ii], "matvec", std::to_string(AD_value(normr)));}; 
       AD_real alpha = 0.0;
-      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE_ITER(alpha, "a_dot",k);
+      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE_LABEL(alpha, "a_dot", std::to_string(AD_value(normr)));
       alpha = rtrans/alpha;
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(x[ii], "x_wxpy", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(x[ii], "x_wxpy", std::to_string(AD_value(normr)));}; 
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(r[ii], "r_wxpy", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(r[ii], "r_wxpy", std::to_string(AD_value(normr)));}; 
       niters = k;
     }
 

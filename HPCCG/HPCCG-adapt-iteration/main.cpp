@@ -203,86 +203,86 @@ int main(int argc, char *argv[])
 
 // initialize YAML doc
 
-  if (rank==0)  // Only PE 0 needs to compute and report timing results
-    {
-      double fniters = niters; 
-      double fnrow = A->total_nrow;
-      double fnnz = A->total_nnz;
-      double fnops_ddot = fniters*4*fnrow;
-      double fnops_waxpby = fniters*6*fnrow;
-      double fnops_sparsemv = fniters*2*fnnz;
-      double fnops = fnops_ddot+fnops_waxpby+fnops_sparsemv;
+//   if (rank==0)  // Only PE 0 needs to compute and report timing results
+//     {
+//       double fniters = niters; 
+//       double fnrow = A->total_nrow;
+//       double fnnz = A->total_nnz;
+//       double fnops_ddot = fniters*4*fnrow;
+//       double fnops_waxpby = fniters*6*fnrow;
+//       double fnops_sparsemv = fniters*2*fnnz;
+//       double fnops = fnops_ddot+fnops_waxpby+fnops_sparsemv;
 
-      YAML_Doc doc("hpccg", "1.0");
+//       YAML_Doc doc("hpccg", "1.0");
 
-      doc.add("Parallelism","");
+//       doc.add("Parallelism","");
 
-#ifdef USING_MPI
-          doc.get("Parallelism")->add("Number of MPI ranks",size);
-#else
-          doc.get("Parallelism")->add("MPI not enabled","");
-#endif
+// #ifdef USING_MPI
+//           doc.get("Parallelism")->add("Number of MPI ranks",size);
+// #else
+//           doc.get("Parallelism")->add("MPI not enabled","");
+// #endif
 
-#ifdef USING_OMP
-          int nthreads = 1;
-#pragma omp parallel
-          nthreads = omp_get_num_threads();
-          doc.get("Parallelism")->add("Number of OpenMP threads",nthreads);
-#else
-          doc.get("Parallelism")->add("OpenMP not enabled","");
-#endif
+// #ifdef USING_OMP
+//           int nthreads = 1;
+// #pragma omp parallel
+//           nthreads = omp_get_num_threads();
+//           doc.get("Parallelism")->add("Number of OpenMP threads",nthreads);
+// #else
+//           doc.get("Parallelism")->add("OpenMP not enabled","");
+// #endif
 
-      doc.add("Dimensions","");
-	  doc.get("Dimensions")->add("nx",nx);
-	  doc.get("Dimensions")->add("ny",ny);
-	  doc.get("Dimensions")->add("nz",nz);
+//       doc.add("Dimensions","");
+// 	  doc.get("Dimensions")->add("nx",nx);
+// 	  doc.get("Dimensions")->add("ny",ny);
+// 	  doc.get("Dimensions")->add("nz",nz);
 
 
 
-      doc.add("Number of iterations: ", niters);
-      doc.add("Final residual: ", AD_value(normr));
-      doc.add("********** Performance Summary (times in sec) ***********","");
+//       doc.add("Number of iterations: ", niters);
+//       doc.add("Final residual: ", AD_value(normr));
+//       doc.add("********** Performance Summary (times in sec) ***********","");
  
-      doc.add("Time Summary","");
-      doc.get("Time Summary")->add("Total   ",times[0]);
-      doc.get("Time Summary")->add("DDOT    ",times[1]);
-      doc.get("Time Summary")->add("WAXPBY  ",times[2]);
-      doc.get("Time Summary")->add("SPARSEMV",times[3]);
+//       doc.add("Time Summary","");
+//       doc.get("Time Summary")->add("Total   ",times[0]);
+//       doc.get("Time Summary")->add("DDOT    ",times[1]);
+//       doc.get("Time Summary")->add("WAXPBY  ",times[2]);
+//       doc.get("Time Summary")->add("SPARSEMV",times[3]);
 
-      doc.add("FLOPS Summary","");
-      doc.get("FLOPS Summary")->add("Total   ",fnops);
-      doc.get("FLOPS Summary")->add("DDOT    ",fnops_ddot);
-      doc.get("FLOPS Summary")->add("WAXPBY  ",fnops_waxpby);
-      doc.get("FLOPS Summary")->add("SPARSEMV",fnops_sparsemv);
+//       doc.add("FLOPS Summary","");
+//       doc.get("FLOPS Summary")->add("Total   ",fnops);
+//       doc.get("FLOPS Summary")->add("DDOT    ",fnops_ddot);
+//       doc.get("FLOPS Summary")->add("WAXPBY  ",fnops_waxpby);
+//       doc.get("FLOPS Summary")->add("SPARSEMV",fnops_sparsemv);
 
-      doc.add("MFLOPS Summary","");
-      doc.get("MFLOPS Summary")->add("Total   ",fnops/times[0]/1.0E6);
-      doc.get("MFLOPS Summary")->add("DDOT    ",fnops_ddot/times[1]/1.0E6);
-      doc.get("MFLOPS Summary")->add("WAXPBY  ",fnops_waxpby/times[2]/1.0E6);
-      doc.get("MFLOPS Summary")->add("SPARSEMV",fnops_sparsemv/(times[3])/1.0E6);
+//       doc.add("MFLOPS Summary","");
+//       doc.get("MFLOPS Summary")->add("Total   ",fnops/times[0]/1.0E6);
+//       doc.get("MFLOPS Summary")->add("DDOT    ",fnops_ddot/times[1]/1.0E6);
+//       doc.get("MFLOPS Summary")->add("WAXPBY  ",fnops_waxpby/times[2]/1.0E6);
+//       doc.get("MFLOPS Summary")->add("SPARSEMV",fnops_sparsemv/(times[3])/1.0E6);
 
-#ifdef USING_MPI
-      doc.add("DDOT Timing Variations","");
-      doc.get("DDOT Timing Variations")->add("Min DDOT MPI_Allreduce time",t4min);
-      doc.get("DDOT Timing Variations")->add("Max DDOT MPI_Allreduce time",t4max);
-      doc.get("DDOT Timing Variations")->add("Avg DDOT MPI_Allreduce time",t4avg);
+// #ifdef USING_MPI
+//       doc.add("DDOT Timing Variations","");
+//       doc.get("DDOT Timing Variations")->add("Min DDOT MPI_Allreduce time",t4min);
+//       doc.get("DDOT Timing Variations")->add("Max DDOT MPI_Allreduce time",t4max);
+//       doc.get("DDOT Timing Variations")->add("Avg DDOT MPI_Allreduce time",t4avg);
 
-      double totalSparseMVTime = times[3] + times[5]+ times[6];
-      doc.add("SPARSEMV OVERHEADS","");
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV MFLOPS W OVERHEAD",fnops_sparsemv/(totalSparseMVTime)/1.0E6);
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Time", (times[5]+times[6]));
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Pct", (times[5]+times[6])/totalSparseMVTime*100.0);
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Setup Time", (times[6]));
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Setup Pct", (times[6])/totalSparseMVTime*100.0);
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Bdry Exch Time", (times[5]));
-      doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Bdry Exch Pct", (times[5])/totalSparseMVTime*100.0);
-#endif
+//       double totalSparseMVTime = times[3] + times[5]+ times[6];
+//       doc.add("SPARSEMV OVERHEADS","");
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV MFLOPS W OVERHEAD",fnops_sparsemv/(totalSparseMVTime)/1.0E6);
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Time", (times[5]+times[6]));
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Pct", (times[5]+times[6])/totalSparseMVTime*100.0);
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Setup Time", (times[6]));
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Setup Pct", (times[6])/totalSparseMVTime*100.0);
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Bdry Exch Time", (times[5]));
+//       doc.get("SPARSEMV OVERHEADS")->add("SPARSEMV PARALLEL OVERHEAD Bdry Exch Pct", (times[5])/totalSparseMVTime*100.0);
+// #endif
   
-      if (rank == 0) { // only PE 0 needs to compute and report timing results
-        std::string yaml = doc.generateYAML();
-        cout << yaml;
-       }
-    }
+//       if (rank == 0) { // only PE 0 needs to compute and report timing results
+//         std::string yaml = doc.generateYAML();
+//         cout << yaml;
+//        }
+//     }
 
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
