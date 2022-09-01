@@ -2,3 +2,5 @@
 *.csv
 *.npy
 *.h5
+*.dat
+cond_space.txt
