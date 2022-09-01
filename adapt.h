@@ -64,6 +64,7 @@
 #define AD_INTERMEDIATE(x,y) AD_intermediate(x, y, SOURCE_INFO)
 #define AD_INTERMEDIATE_ACC(x,y) AD_intermediate(x, y, SOURCE_INFO, true)
 #define AD_INTERMEDIATE_ITER(x,y,z) AD_intermediate_iter(x, y, SOURCE_INFO, z)
+#define AD_INTERMEDIATE_LABEL(x,y,z) AD_intermediate_label(x, y, SOURCE_INFO, z)
 #define AD_DEPENDENT(x,y,z)  AD_dependent   (x, y, z)
 
 /*
@@ -124,6 +125,7 @@ void AD_independent(AD_real &var, std::string label, std::string source);
 void AD_intermediate(AD_real &var, std::string label);
 void AD_intermediate(AD_real &var, std::string label, std::string source, bool isAccVar=false);
 void AD_intermediate_iter(AD_real &var, std::string label, std::string source, int iter);
+void AD_intermediate_label(AD_real &var, std::string label, std::string source, std::string tag);
 
 /*
  * Register a dependent (output) variable and a tolerable error bound.
