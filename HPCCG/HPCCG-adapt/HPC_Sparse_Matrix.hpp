@@ -26,9 +26,11 @@
 // 
 // ************************************************************************
 //@HEADER
+#include "adapt.h"
 
 #ifndef HPC_SPARSE_MATRIX_H
 #define HPC_SPARSE_MATRIX_H
+
 
 // These constants are upper bounds that might need to be changes for 
 // pathological matrices, e.g., those with nearly dense rows/columns.
@@ -48,9 +50,9 @@ struct HPC_Sparse_Matrix_STRUCT {
   int local_ncol;  // Must be defined in make_local_matrix
   int local_nnz;
   int  * nnz_in_row;
-  double ** ptr_to_vals_in_row;
+  AD_real ** ptr_to_vals_in_row;
   int ** ptr_to_inds_in_row;
-  double ** ptr_to_diags;
+  AD_real ** ptr_to_diags;
 
 #ifdef USING_MPI
   int num_external;
@@ -62,10 +64,10 @@ struct HPC_Sparse_Matrix_STRUCT {
   int *neighbors;
   int *recv_length;
   int *send_length;
-  double *send_buffer;
+  AD_real *send_buffer;
 #endif
 
-  double *list_of_vals;   //needed for cleaning up memory
+  AD_real *list_of_vals;   //needed for cleaning up memory
   int *list_of_inds;      //needed for cleaning up memory
 
 };

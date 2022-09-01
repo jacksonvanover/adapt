@@ -35,7 +35,6 @@
 #include "HPC_Sparse_Matrix.hpp"
 #include "adapt.h"
 
-void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, double **x, double **b, double **xexact);
-
 void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, AD_real **x, AD_real **b, double **xexact);
+void readHBSMF(std::string input_file, HPC_Sparse_Matrix **A, AD_real **x, AD_real **b, double **xexact);
 #endif

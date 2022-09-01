@@ -108,9 +108,9 @@ TARGET = test_HPCCG
 
 CXXFLAGS= $(CPP_OPT_FLAGS) $(ADAPTFLAGS) $(OMP_FLAGS) $(USE_OMP) $(USE_MPI) $(MPI_INC)
 
-LIB_PATHS= $(SYS_LIB)
+LIB_PATHS= $(SYS_LIB) -lstdc++
 
-TEST_CPP = main.cpp generate_matrix.cpp read_HPC_row.cpp \
+TEST_CPP = main.cpp HBFormat.cpp generate_matrix.cpp read_HPC_row.cpp \
 	  compute_residual.cpp mytimer.cpp dump_matlab_matrix.cpp \
           HPC_sparsemv.cpp HPCCG.cpp waxpby.cpp ddot.cpp \
           make_local_matrix.cpp exchange_externals.cpp \

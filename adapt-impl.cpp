@@ -150,6 +150,14 @@ void AD_intermediate_iter(AD_real &var, std::string label, std::string source, i
     AD_intermediate(var, label);
 }
 
+void AD_intermediate_label(AD_real &var, std::string label, std::string source, std::string tag)
+{
+    if (useSourceInfo) {
+        label = label + ":" + source;
+    }
+    label = label + ": " + tag;
+    AD_intermediate(var, label);
+}
 
 void AD_dependent(AD_real &var, std::string label, double toleratedError)
 {
@@ -198,9 +206,11 @@ void AD_report()
     // behavior can be enabled using AD_enable_source_aggregation()
     //
     std::unordered_map<std::string, long>        varCount;
-    std::unordered_map<std::string, double> varMetric;
+    std::unordered_map<std::string, std::vector<double>> varMetrics;
     std::unordered_map<std::string, std::vector<double>> varPartials;
     std::unordered_map<std::string, std::vector<double> > varOutputError;
+    std::unordered_map<std::string, std::vector<double>> varErrors;
+    std::unordered_map<std::string, std::vector<double>> varValues;
 
     // dependent labels and tolerated errors
     std::vector<std::string> depLabels;
@@ -239,13 +249,15 @@ void AD_report()
 
             // output sensitivity (aggregated by variable)
             // TODO: change this for multiple dependent variables?
-            if (varMetric.find(inputLabel) == varMetric.end()) {
-                varMetric[inputLabel] = 0.0;
-            }
-            varMetric[inputLabel] += partial * value;
+            // if (varMetrics.find(inputLabel) == varMetrics.end()) {
+            //     varMetrics[inputLabel] = 0.0;
+            // }
+            varMetrics[inputLabel].push_back(fabs(partial * value));
 
-            // save the partials for this input variable
+            // save the partials, truncation errors, and values for this variable
             varPartials[inputLabel].push_back(partial);
+            varErrors[inputLabel].push_back(varInputError);
+            varValues[inputLabel].push_back(value);
 
             // output error if converted to single precision (aggregated by
             // variable, stored separately for each dependent variable)
@@ -323,20 +335,11 @@ void AD_report()
             std::cout << totalError[i];           // total error contribution 
         }
 
-        double agg_partials = 0;
-        double avg_partials;
-        double std_partials;
-        for (auto& x : varPartials[var.first]){
-            agg_partials = agg_partials + fabs(x);
+        double agg_metric = 0;
+        for (auto& x : varMetrics[var.first]){
+            agg_metric = agg_metric + x;
         }
-        avg_partials = agg_partials / varPartials[var.first].size();
-        agg_partials = 0;
-        for (auto& x : varPartials[var.first]){
-            agg_partials = agg_partials + pow(x - avg_partials, 2);
-        }
-        std_partials = sqrt(agg_partials/varPartials[var.first].size());
-        std::cout << "  avg of partials: " << avg_partials;
-        std::cout << "  std of partials: " << std_partials;
+        std::cout << "  total sensitivity: " << agg_metric;
         std::cout << std::endl;
     }
 
@@ -368,7 +371,7 @@ void AD_report()
     //DUMP_VEC(depLabels);
     //DUMP_MAP(depErrs);
     //DUMP_MAP(varCount);
-    //DUMP_MAP(varMetric);
+    //DUMP_MAP(varMetrics);
     //DUMP_MAPVEC(varOutputError);
     //DUMP_MAP(vars);
 

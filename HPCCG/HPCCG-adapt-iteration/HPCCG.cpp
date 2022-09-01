@@ -102,7 +102,6 @@ int HPCCG(HPC_Sparse_Matrix * A,
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
   normr = sqrt(AD_value(rtrans));
-  AD_INTERMEDIATE(normr, "normr");
 
   if (rank==0) cout << "Initial Residual = "<< AD_value(normr) << endl;
 
@@ -116,13 +115,12 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	{
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
+    AD_INTERMEDIATE_LABEL(rtrans, "r_dot", std::to_string(AD_value(normr)));
 	  AD_real beta = rtrans/oldrtrans;
-          AD_INTERMEDIATE(beta, "beta");
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
-	  //for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(p[ii], "p"+std::to_string(k));}; 
+	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(p[ii], "p_wxpy", std::to_string(AD_value(normr)));}; 
 	}
       normr = sqrt(rtrans);
-      AD_INTERMEDIATE(normr, "normr");
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
       cout << "Iteration = "<< k << "   Residual = "<< AD_value(normr) << endl;
      
@@ -132,14 +130,14 @@ int HPCCG(HPC_Sparse_Matrix * A,
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
 
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(Ap[ii], "Ap", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(Ap[ii], "matvec", std::to_string(AD_value(normr)));}; 
       AD_real alpha = 0.0;
-      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE(alpha, "alpha");
-      alpha = rtrans/alpha; AD_INTERMEDIATE(alpha, "alpha");
+      TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); AD_INTERMEDIATE_LABEL(alpha, "a_dot", std::to_string(AD_value(normr)));
+      alpha = rtrans/alpha;
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(x[ii], "x", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(x[ii], "x_wxpy", std::to_string(AD_value(normr)));}; 
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
-	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_ITER(r[ii], "r", k);}; 
+	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(r[ii], "r_wxpy", std::to_string(AD_value(normr)));}; 
       niters = k;
     }
 

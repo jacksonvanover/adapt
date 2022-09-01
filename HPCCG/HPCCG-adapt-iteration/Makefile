@@ -107,9 +107,9 @@ TARGET = test_HPCCG
 
 CXXFLAGS= $(CPP_OPT_FLAGS) $(ADAPTFLAGS) $(OMP_FLAGS) $(USE_OMP) $(USE_MPI) $(MPI_INC)
 
-LIB_PATHS= $(SYS_LIB)
+LIB_PATHS= $(SYS_LIB) -lstdc++
 
-TEST_CPP = main.cpp generate_matrix.cpp read_HPC_row.cpp \
+TEST_CPP = main.cpp HBFormat.cpp generate_matrix.cpp read_HPC_row.cpp \
 	  compute_residual.cpp mytimer.cpp dump_matlab_matrix.cpp \
           HPC_sparsemv.cpp HPCCG.cpp waxpby.cpp ddot.cpp \
           make_local_matrix.cpp exchange_externals.cpp \
@@ -121,14 +121,7 @@ $(TARGET): $(TEST_OBJ)
 	$(LINKER) $(CPP_OPT_FLAGS) $(ADAPTFLAGS) $(OMP_FLAGS) $(TEST_OBJ) $(LIB_PATHS) -o $(TARGET)
 
 test:
-	./test_HPCCG 20 30 160 > adval_Ap_100_nofabs_iter.log
-	grep -i "replace * Ap:HPCCG.cpp:135:" adval_Ap_100_nofabs_iter.log | awk -F' ' '{print $$5, $$9;}' > Apiter.csv
-	grep -i "replace * x:HPCCG.cpp:140" adval_Ap_100_nofabs_iter.log | awk -F' ' '{print $$5, $$9;}' > Xiter.csv
-	grep -i "replace * r:HPCCG.cpp:142" adval_Ap_100_nofabs_iter.log | awk -F' ' '{print $$5, $$9;}' > Riter.csv
-	sort Apiter.csv -n > Apiter_sort.csv
-	sort Xiter.csv -n > Xiter_sort.csv
-	sort Riter.csv -n > Riter_sort.csv
-	gnuplot varerr.plot
+	./test_HPCCG 20 30 160
 
 clean:
-	@rm -f *.o  *~ $(TARGET) $(TARGET).exe test_HPCPCG *.csv *.log *.pdf 
+	@rm -f *.o  *~ $(TARGET) $(TARGET).exe test_HPCPCG 

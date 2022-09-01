@@ -34,7 +34,7 @@
 #
 # 0) Specify compiler and linker:
 
-CXX=clang
+CXX=clang++ -g
 LINKER=clang
 #CXX=mpicxx
 #LINKER=mpicxx
@@ -64,7 +64,7 @@ USE_MPI =
 
 #IA32 with GCC: 
 #CPP_OPT_FLAGS = -O3 -funroll-all-loops -malign-double
-CPP_OPT_FLAGS = -fapprox
+CPP_OPT_FLAGS = 
 
 #
 # 4) MPI library:
@@ -105,9 +105,9 @@ TARGET = test_HPCCG
 
 CXXFLAGS= $(CPP_OPT_FLAGS) $(OMP_FLAGS) $(USE_OMP) $(USE_MPI) $(MPI_INC)
 
-LIB_PATHS= $(SYS_LIB) -lapprox -lhdf5 -lstdc++
+LIB_PATHS= $(SYS_LIB) -lstdc++
 
-TEST_CPP = main.cpp generate_matrix.cpp read_HPC_row.cpp \
+TEST_CPP = main.cpp HBFormat.cpp generate_matrix.cpp read_HPC_row.cpp \
 	  compute_residual.cpp mytimer.cpp dump_matlab_matrix.cpp \
           HPC_sparsemv.cpp HPCCG.cpp waxpby.cpp ddot.cpp \
           make_local_matrix.cpp exchange_externals.cpp \
