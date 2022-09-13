@@ -69,3 +69,33 @@ int ddot (const int n, const double * const x, const double * const y,
 
   return(0);
 }
+
+int ddot_f (const int n, const double * const x, const double * const y, 
+	  double * const result, double & time_allreduce)
+{  
+  float local_result = 0.0;
+  if (y==x)
+#ifdef USING_OMP
+#pragma omp parallel for reduction (+:local_result)
+#endif
+    for (int i=0; i<n; i++) local_result += x[i]*x[i];
+  else
+#ifdef USING_OMP
+#pragma omp parallel for reduction (+:local_result)
+#endif
+    for (int i=0; i<n; i++) local_result += x[i]*y[i];
+
+#ifdef USING_MPI
+  // Use MPI's reduce function to collect all partial sums
+  double t0 = mytimer();
+  float global_result = 0.0;
+  MPI_Allreduce(&local_result, &global_result, 1, MPI_FLOAT, MPI_SUM, 
+                MPI_COMM_WORLD);
+  *result = global_result;
+  time_allreduce += mytimer() - t0;
+#else
+  *result = local_result;
+#endif
+
+  return(0);
+}
