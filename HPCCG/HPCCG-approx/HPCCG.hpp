@@ -33,6 +33,7 @@
 #include "ddot.hpp"
 #include "waxpby.hpp"
 #include "HPC_Sparse_Matrix.hpp"
+#include <vector>
 
 #ifdef USING_MPI
 #include "exchange_externals.hpp"
@@ -58,7 +59,7 @@
 
 int HPCCG(HPC_Sparse_Matrix * A,
 	  const double * const b, double * const x,
-	  const int max_iter, const double tolerance, int & niters, double & normr, double * times);
-
-
+	  const int max_iter, const double tolerance, int &niters, double & normr,
+	  double * times, double const * relative_err, std::vector<std::pair<double,double>> residual_bounds);
+	  
 #endif

@@ -52,9 +52,16 @@ using std::cout;
 using std::cerr;
 using std::endl;
 #include <cmath>
+#include <vector>
 #include "mytimer.hpp"
 #include "HPCCG.hpp"
 
+#define X_WXPY 0
+#define P_WXPY 1
+#define R_DOT 2
+#define R_WXPY 3
+#define MATVEC 4
+#define A_DOT 5
 
 #define TICK()  t0 = mytimer() // Use TICK and TOCK to time a code section
 #define TOCK(t) t += mytimer() - t0
@@ -62,9 +69,10 @@ using std::endl;
 int HPCCG(HPC_Sparse_Matrix * A,
 	  const double * const b, double * const x,
 	  const int max_iter, const double tolerance, int &niters, double & normr,
-	  double * times)
+	  double * times, double const * relative_err, std::vector<std::pair<double,double>> residual_bounds)
 
 {
+  bool approx_flag;
   double t_begin = mytimer();  // Start timing right away
 
   double t0 = 0.0, t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0;
@@ -102,6 +110,13 @@ int HPCCG(HPC_Sparse_Matrix * A,
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
   normr = sqrt(rtrans);
+  approx_flag = false;
+  for (const auto& b : residual_bounds){
+    if (normr > b.first && normr < b.second){
+      approx_flag = true;
+      break;
+    }
+  }
 
   if (rank==0) cout << "Initial Residual = "<< normr << endl;
 
@@ -115,30 +130,56 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	{
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
-//    AD_INTERMEDIATE_LABEL(rtrans, "r_dot", std::to_string(AD_value(normr)));
-	  double beta = rtrans/oldrtrans;
+    if (approx_flag && relative_err[R_DOT] > 0) {
+      rtrans = rtrans + relative_err[R_DOT] * rtrans;
+    }
+	  
+    double beta = rtrans/oldrtrans;
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
-//	  for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(p[ii], "p_wxpy", std::to_string(AD_value(normr)));}; 
+    if (approx_flag && relative_err[P_WXPY] > 0) {
+      for(int ii=0; ii < nrow; ii++){
+        p[ii] = p[ii] + relative_err[P_WXPY] * p[ii];
+      }
+    }
+
 	}
       normr = sqrt(rtrans);
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
       cout << "Iteration = "<< k << "   Residual = "<< normr << endl;
-     
+      for (const auto& b : residual_bounds){
+        if (normr > b.first && normr < b.second){
+          approx_flag = true;
+          break;
+        }
+      }
 
 #ifdef USING_MPI
       TICK(); exchange_externals(A,p); TOCK(t5); 
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
-
-//	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(Ap[ii], "matvec", std::to_string(AD_value(normr)));}; 
+      if (approx_flag && relative_err[MATVEC] > 0) {
+        for(int ii=0; ii < nrow; ii++){
+          Ap[ii] = Ap[ii] + relative_err[MATVEC] * Ap[ii];
+        }
+      }
       double alpha = 0.0;
       TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1);
-// AD_INTERMEDIATE_LABEL(alpha, "a_dot", std::to_string(AD_value(normr)));
+      if (approx_flag && relative_err[A_DOT] > 0) {
+        alpha = alpha + relative_err[A_DOT] * alpha;
+      }
       alpha = rtrans/alpha;
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
-//	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(x[ii], "x_wxpy", std::to_string(AD_value(normr)));}; 
+      if (approx_flag && relative_err[X_WXPY] > 0) {
+        for(int ii=0; ii < nrow; ii++){
+          x[ii] = x[ii] + relative_err[X_WXPY] * x[ii];
+        }
+      }
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
-//	for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE_LABEL(r[ii], "r_wxpy", std::to_string(AD_value(normr)));}; 
+      if (approx_flag && relative_err[R_WXPY] > 0) {
+        for(int ii=0; ii < nrow; ii++){
+          r[ii] = r[ii] + relative_err[R_WXPY] * r[ii];
+        }
+      }
       niters = k;
     }
 

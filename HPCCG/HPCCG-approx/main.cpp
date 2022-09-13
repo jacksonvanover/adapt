@@ -61,6 +61,7 @@ using std::cerr;
 using std::endl;
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <cctype>
 #include <cassert>
 #include <string>
@@ -88,7 +89,12 @@ using std::endl;
 
 #undef DEBUG
 
-
+#define X_WXPY 0
+#define P_WXPY 1
+#define R_DOT 2
+#define R_WXPY 3
+#define MATVEC 4
+#define A_DOT 5
 
 int main(int argc, char *argv[])
 {
@@ -102,7 +108,11 @@ int main(int argc, char *argv[])
   double times[7];
   double t6 = 0.0;
   int nx,ny,nz;
-
+  double relative_err[6];
+  std::vector<std::pair<double,double>> residual_bounds;
+  int max_iter = 100000;
+  double tolerance = 1e-50; // Set tolerance to zero to make all runs do max_iter iterations
+  
 #ifdef USING_MPI
 
   MPI_Init(&argc, &argv);
@@ -132,13 +142,9 @@ int main(int argc, char *argv[])
 #endif
 
 
-  if(argc != 2 && argc!=4) {
+  if(argc != 11 && argc!=4) {
     if (rank==0)
-      cerr << "Usage:" << endl
-	   << "Mode 1: " << argv[0] << " nx ny nz" << endl
-	   << "     where nx, ny and nz are the local sub-block dimensions, or" << endl
-	   << "Mode 2: " << argv[0] << " HPC_data_file " << endl
-	   << "     where HPC_data_file is a globally accessible file containing matrix data." << endl;
+      cerr << "Incorrect # CL args" << endl;
     exit(1);
   }
 
@@ -152,8 +158,32 @@ int main(int argc, char *argv[])
   else
   {
     readHBSMF(argv[1], &A, &x, &b, &xexact);
-  }
 
+    max_iter = atoi(argv[2]);
+    tolerance = atof(argv[3]);
+    relative_err[X_WXPY] = atof(argv[4]);
+    relative_err[P_WXPY] = atof(argv[5]);
+    relative_err[R_DOT] = atof(argv[6]);
+    relative_err[R_WXPY] = atof(argv[7]);
+    relative_err[MATVEC] = atof(argv[8]);
+    relative_err[A_DOT] = atof(argv[9]);
+
+    std::ifstream inFile;
+    std::string inputBuffer;
+
+    inFile.open(argv[10], std::ios::in);
+    if (inFile.is_open()){
+      while( getline(inFile, inputBuffer)){
+        size_t splitpoint = inputBuffer.find(":");
+        double lb = stof(inputBuffer.substr(0, splitpoint));
+        inputBuffer.erase(0, splitpoint+1);
+        double ub = stof(inputBuffer);
+        residual_bounds.push_back(std::make_pair(lb,ub));
+      }
+    }else{
+      exit(1);
+    }
+  }
 
   bool dump_matrix = false;
   if (dump_matrix && size<=4) dump_matlab_matrix(A, rank);
@@ -171,10 +201,8 @@ int main(int argc, char *argv[])
   double t1 = mytimer();   // Initialize it (if needed)
   int niters = 0;
   double normr = 0.0;
-  int max_iter = 100000;
-  double tolerance = 1e-50; // Set tolerance to zero to make all runs do max_iter iterations
 
-  ierr = HPCCG( A, b, x, max_iter, tolerance, niters, normr, times);
+  ierr = HPCCG( A, b, x, max_iter, tolerance, niters, normr, times, relative_err, residual_bounds);
 	if (ierr) cerr << "Error in call to CG: " << ierr << ".\n" << endl;
 
 #ifdef USING_MPI
@@ -279,10 +307,11 @@ int main(int argc, char *argv[])
     cerr << "Error in call to compute_residual: " << ierr << ".\n" << endl;
 
    if (rank==0)
-     cout << std::setprecision(5) << "Difference between computed and exact (residual)  = " 
-          << residual << ".\n" << endl;
+     cout << std::setprecision(10) << "\nDifference between computed and exact (residual)  = " 
+          << residual << endl;
 
-
+     cout << std::setprecision(10) << "Iteration count  = " 
+          << niters << "\n" << endl;
 
   // Finish up
 #ifdef USING_MPI
