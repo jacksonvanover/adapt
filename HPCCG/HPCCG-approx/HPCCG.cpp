@@ -130,18 +130,29 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	{
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
-    if (approx_flag && relative_err[R_DOT] > 0) {
-      rtrans = rtrans + relative_err[R_DOT] * rtrans;
+    if (approx_flag){
+      if (relative_err[R_DOT] > 0) {
+        rtrans = rtrans + relative_err[R_DOT] * rtrans;
+      }
+      else if (relative_err[R_DOT] < 0){
+        rtrans = (float) rtrans;
+      }
     }
 	  
     double beta = rtrans/oldrtrans;
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
-    if (approx_flag && relative_err[P_WXPY] > 0) {
-      for(int ii=0; ii < nrow; ii++){
-        p[ii] = p[ii] + relative_err[P_WXPY] * p[ii];
+    if (approx_flag) {
+      if (relative_err[P_WXPY] > 0){
+        for(int ii=0; ii < nrow; ii++){
+          p[ii] = p[ii] + relative_err[P_WXPY] * p[ii];
+        }
+      }
+      else if (relative_err[P_WXPY] < 0){
+        for(int ii=0; ii < nrow; ii++){
+          p[ii] = (float) p[ii];
+        }
       }
     }
-
 	}
       normr = sqrt(rtrans);
       if (rank==0 && (k%print_freq == 0 || k+1 == max_iter))
@@ -157,27 +168,53 @@ int HPCCG(HPC_Sparse_Matrix * A,
       TICK(); exchange_externals(A,p); TOCK(t5); 
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
-      if (approx_flag && relative_err[MATVEC] > 0) {
-        for(int ii=0; ii < nrow; ii++){
-          Ap[ii] = Ap[ii] + relative_err[MATVEC] * Ap[ii];
+      if (approx_flag){
+        if (relative_err[MATVEC] > 0) {
+          for(int ii=0; ii < nrow; ii++){
+            Ap[ii] = Ap[ii] + relative_err[MATVEC] * Ap[ii];
+          }
+        }
+        else if (relative_err[MATVEC] < 0){
+          for(int ii=0; ii < nrow; ii++){
+            Ap[ii] = (float) Ap[ii];
+          }
         }
       }
       double alpha = 0.0;
       TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1);
-      if (approx_flag && relative_err[A_DOT] > 0) {
-        alpha = alpha + relative_err[A_DOT] * alpha;
+      if (approx_flag) {
+        if (relative_err[A_DOT] > 0) {
+          alpha = alpha + relative_err[A_DOT] * alpha;
+        }
+        else if (relative_err[A_DOT] < 0){
+          alpha = (float) alpha;
+        }
       }
       alpha = rtrans/alpha;
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
-      if (approx_flag && relative_err[X_WXPY] > 0) {
-        for(int ii=0; ii < nrow; ii++){
-          x[ii] = x[ii] + relative_err[X_WXPY] * x[ii];
+      if (approx_flag){
+        if (relative_err[X_WXPY] > 0) {
+          for(int ii=0; ii < nrow; ii++){
+            x[ii] = x[ii] + relative_err[X_WXPY] * x[ii];
+          }
+        }
+        else if (relative_err[X_WXPY] < 0){
+          for(int ii=0; ii < nrow; ii++){
+            x[ii] = (float) x[ii];
+          }          
         }
       }
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
-      if (approx_flag && relative_err[R_WXPY] > 0) {
-        for(int ii=0; ii < nrow; ii++){
-          r[ii] = r[ii] + relative_err[R_WXPY] * r[ii];
+      if (approx_flag){
+        if (relative_err[R_WXPY] > 0) {
+          for(int ii=0; ii < nrow; ii++){
+            r[ii] = r[ii] + relative_err[R_WXPY] * r[ii];
+          }
+        }
+        else if (relative_err[R_WXPY] < 0){
+          for(int ii=0; ii < nrow; ii++){
+            r[ii] = (float) r[ii];
+          }
         }
       }
       niters = k;
