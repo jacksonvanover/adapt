@@ -252,7 +252,7 @@ void AD_report()
             // if (varMetrics.find(inputLabel) == varMetrics.end()) {
             //     varMetrics[inputLabel] = 0.0;
             // }
-            varMetrics[inputLabel].push_back(fabs(partial * value));
+            varMetrics[inputLabel].push_back(partial * value);
 
             // save the partials, truncation errors, and values for this variable
             varPartials[inputLabel].push_back(partial);
